@@ -1,11 +1,12 @@
 <template>
 	<section id="nonogram">
+		<div id="title">{{ title }} <small id="nn-size">{{ nnSize }}</small></div>
 		<div id="nnWrapper">
 			<div>
 				<div class="row" v-for="(col, i) in nnCols[0].length" :key="i">
-					<div class="col cell nnRow nnRowEmpty" v-for="i in nnRows[0].length">&nbsp;</div>
+					<div class="col cell nnRow nnRowEmpty" v-for="i in nnRows[0].length" :key="i">&nbsp;</div>
 					<div class="col cell nnRow" v-for="(cell, j) in nnCols" :key="j">
-					<small>{{ nnCols[j][i] ? nnCols[j][i] : '&nbsp;' }}</small>
+						<small>{{ nnCols[j][i] ? nnCols[j][i] : '&nbsp;' }}</small>
 					</div>
 				</div>
 				<div class="row" v-for="(row, i) in nonogram" :key="i">
@@ -14,7 +15,9 @@
 					</div>
 					<square :coords="[i, j]" v-for="(cell, j) in row" :key="j" @clickedSquare="updateNn"></square>
 				</div>
-				<div><small>{{ nnSize }}</small></div>
+				<div id="progress">
+					<div :style="'width:'+ progressPercentage + '%'"></div>
+				</div>
 			</div>
 		</div>
 	</section>
@@ -29,6 +32,10 @@
   name: 'Vuenogram',
 	components: { square },
 	props: {
+		title: {
+			type: String,
+			default: "No title"
+		},
 		nonogram: {
 			type: Array,
 			required: true
@@ -48,12 +55,23 @@
 	},
 	methods: {
 		updateNn(clicked, coords) {
-			this.progress[coords[0]][coords[1]] = clicked ? 1 : 0
+			// this.progress[coords[0]][coords[1]] = clicked ? 1 : 0
+			this.progress[coords[0]].splice(coords[1],1,clicked ? 1 : 0)
 		}
 	},
 	computed: {
+		total() {
+			return compact(flatten(this.nonogram)).length
+		},
 		countProgress() {
 			return compact(flatten(this.progress)).length
+		},
+		progressPercentage() {
+			let per = (this.countProgress * 100) / this.total
+			if (this.countProgress >= this.total)
+				return 100
+			else
+				return per
 		},
 		nnSize() {
 			return this.nonogram.length + "x" + this.nonogram[0].length
@@ -176,5 +194,19 @@
 }
 .nnRow.nnRowEmpty {
 	opacity: .8
+}
+
+#progress {
+	background: #DDD;
+	height: 3px;
+	margin: 10px 1px;
+	border-radius: 2px;
+}
+
+#progress div {
+	background: #41B883;
+	height: 100%;
+	border-radius: 2px;
+	transition: width ease .5s;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
 	<div id="app">
 		<h3>Vuenograms</h3>
-		<vuenogram :nonogram="nonogram"></vuenogram>
+		<vuenogram title="Prueba" :nonogram="nonogram"></vuenogram>
 	</div>
 </template>
 
